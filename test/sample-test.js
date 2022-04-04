@@ -15,15 +15,21 @@ describe("PurchaseHook", function () {
 
 
     // signing wrong message
-    expect(await hook.checkIsSigner(sender, await secretSigner.signMessage("hello"))).to.equal(false);
-    expect(await hook.checkIsSigner("hello", await secretSigner.signMessage(sender))).to.equal(false);
+    // expect(await hook.checkIsSigner(sender, await secretSigner.signMessage("hello"))).to.equal(false);
+    // expect(await hook.checkIsSigner("hello", await secretSigner.signMessage(sender))).to.equal(false);
 
     // wrong signer
-    expect(await hook.checkIsSigner(sender, await user.signMessage(sender))).to.equal(false);
+    // expect(await hook.checkIsSigner(sender, await user.signMessage(sender))).to.equal(false);
 
     // Correct signer, correct message
-    expect(await hook.checkIsSigner("hello", await secretSigner.signMessage("hello"))).to.equal(true);
-    expect(await hook.checkIsSigner(sender, await secretSigner.signMessage(sender))).to.equal(true);
+    const message = "hello"
+    const secretSignerAddress = secretSigner.address
+    const signedMessage = await secretSigner.signMessage(message)
+    console.log({ signedMessage, message, secretSignerAddress })
+    expect(ethers.utils.verifyMessage(message, signedMessage), secretSignerAddress)
+    console.log(await hook.secretSigner())
+    expect(await hook.checkIsSigner(message, signedMessage)).to.equal(true);
+    // expect(await hook.checkIsSigner(sender, await secretSigner.signMessage(sender))).to.equal(true);
 
 
   });

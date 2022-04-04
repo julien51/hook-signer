@@ -51,6 +51,7 @@ contract PurchaseHook {
         bytes calldata signature /* data */
     ) external view returns (uint256 minKeyPrice) {
         string memory message = toString(from);
+        console.log(message);
         require(checkIsSigner(message, signature), "WRONG_SIGNATURE");
         if (address(msg.sender).code.length > 0) {
             return IPublicLockV9(msg.sender).keyPrice();
