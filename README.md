@@ -1,15 +1,13 @@
-# Basic Sample Hardhat Project
+# Captcha Hook for Locks
 
-This project demonstrates a basic Hardhat use case. It comes with a sample contract, a test for that contract, a sample script that deploys that contract, and an example of a task implementation, which simply lists the available accounts.
+This project implements an Unlock PublicLock Hook that can be used on PublicLocks in order to ensure that users went through the Unlock front-end when sending their purchase transactions.
 
-Try running some of the following tasks:
+The Unlock Protocol team has deployed a version of this hook on the following networks:
 
-```shell
-npx hardhat accounts
-npx hardhat compile
-npx hardhat clean
-npx hardhat test
-npx hardhat node
-node scripts/sample-script.js
-npx hardhat help
-```
+- Polygon
+- Gnosis Chain
+- Rinkeby
+
+It can also be deployed on other chains.
+
+Please, make sure you use the `captcha` option in the `paywallConfig` object for the captcha to actually be completed and transactions to go through.

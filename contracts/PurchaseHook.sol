@@ -2,24 +2,31 @@
 pragma solidity ^0.8.0;
 
 import "@openzeppelin/contracts/utils/cryptography/ECDSA.sol";
-import "@unlock-protocol/contracts/dist/PublicLock/IPublicLockV9.sol";
+import "@unlock-protocol/contracts/dist/PublicLock/IPublicLockV10.sol";
 import "hardhat/console.sol";
 
 contract PurchaseHook {
     address public secretSigner;
-    address public lock;
 
-    constructor(address _lock, address _secretSigner) {
+    constructor(address _secretSigner) {
         secretSigner = _secretSigner;
-        lock = _lock;
     }
 
-    function changeSigner(address _secretSigner) public {
-        require(
-            IPublicLockV9(lock).isLockManager(msg.sender),
-            "NOT_LOCK_MANAGER"
-        );
-        secretSigner = _secretSigner;
+    /**
+     * Price is the same for everyone... but we fail if signature by Unlock Lab's backend service (sent as signature) does not match!
+     */
+    function keyPurchasePrice(
+        address, /* from */
+        address recipient,
+        address, /* referrer */
+        bytes calldata signature /* data */
+    ) external view returns (uint256 minKeyPrice) {
+        string memory message = toString(recipient);
+        require(checkIsSigner(message, signature), "WRONG_SIGNATURE");
+        if (address(msg.sender).code.length > 0) {
+            return IPublicLock(msg.sender).keyPrice();
+        }
+        return 0;
     }
 
     /**
@@ -33,30 +40,7 @@ contract PurchaseHook {
         bytes32 messageHash = keccak256(encoded);
         bytes32 hash = ECDSA.toEthSignedMessageHash(messageHash);
         address recoveredAddress = ECDSA.recover(hash, signature);
-        console.log(
-            "recoveredAddress %s : secretSigner %s",
-            recoveredAddress,
-            secretSigner
-        );
         return recoveredAddress == secretSigner;
-    }
-
-    /**
-     * Price is the same for everyone... but we fail if signature does not match!
-     */
-    function keyPurchasePrice(
-        address from, /* from */
-        address, /* recipient */
-        address, /* referrer */
-        bytes calldata signature /* data */
-    ) external view returns (uint256 minKeyPrice) {
-        string memory message = toString(from);
-        console.log(message);
-        require(checkIsSigner(message, signature), "WRONG_SIGNATURE");
-        if (address(msg.sender).code.length > 0) {
-            return IPublicLockV9(msg.sender).keyPrice();
-        }
-        return 0;
     }
 
     /**
@@ -88,7 +72,7 @@ contract PurchaseHook {
     }
 
     /**
-     *
+     * No-op but required
      */
     function onKeyPurchase(
         address, /*from*/

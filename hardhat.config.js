@@ -1,14 +1,6 @@
 require("@nomiclabs/hardhat-waffle");
-
-// This is a sample Hardhat task. To learn how to create your own go to
-// https://hardhat.org/guides/create-task.html
-task("accounts", "Prints the list of accounts", async (taskArgs, hre) => {
-  const accounts = await hre.ethers.getSigners();
-
-  for (const account of accounts) {
-    console.log(account.address);
-  }
-});
+require("@nomiclabs/hardhat-etherscan");
+require("@unlock-protocol/hardhat-plugin");
 
 // You need to export an object to set up your config
 // Go to https://hardhat.org/config/ to learn more
@@ -17,5 +9,34 @@ task("accounts", "Prints the list of accounts", async (taskArgs, hre) => {
  * @type import('hardhat/config').HardhatUserConfig
  */
 module.exports = {
-  solidity: "0.8.4",
+  solidity: {
+    version: '0.8.7',
+    // optimizer is required to deploy unlock contracts
+    optimizer: {
+      enabled: true,
+      runs: 200,
+    },
+  },
+  networks: {
+    hardhat: {
+      gas: 1000000000,
+      allowUnlimitedContractSize: true,
+      blockGasLimit: 1000000000,
+    },
+    polygon: {
+      url: "https://polygon-rpc.com/",
+      accounts: []
+    },
+    rinkeby: {
+      url: `https://rinkeby.infura.io/v3/9aa3d95b3bc440fa88ea12eaa4456161`,
+      accounts: []
+    }
+  },
+  etherscan: {
+    apiKey: {
+      polygon: 'W9TVEYKW2CDTQ94T3A2V93IX6U3IHQN5Y3',
+      mainnet: 'HPSH1KQDPJTNAPU3335G931SC6Y3ZYK3BF',
+      rinkeby: 'HPSH1KQDPJTNAPU3335G931SC6Y3ZYK3BF',
+    }
+  },
 };
